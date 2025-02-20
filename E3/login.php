@@ -3,10 +3,10 @@
 session_start();
 
 // Database connection details
-$host = "localhost";
-$dbname = "user_auth";
-$user = "root";  // Change this if using another database user
-$pass = "";      // Change if your database has a password
+$host = "100.93.130.48";
+$dbname = "moveDB";
+$user = "";  // Ask about database user name 
+$pass = "";      // If there is a username check for password for DB
 
 // Connect to MySQL database
 $conn = new mysqli($host, $user, $pass, $dbname);
@@ -23,6 +23,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $pword = $_POST['pword'];
 
     // Prepare an SQL statement to prevent SQL injection
+    //Looked this up. Found solution on stack overflow
     $stmt = $conn->prepare("SELECT password FROM users WHERE username = ?");
     $stmt->bind_param("s", $uname);
     $stmt->execute();
