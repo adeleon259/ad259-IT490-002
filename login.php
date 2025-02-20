@@ -22,8 +22,15 @@ if (!isset($request["type"]) || !isset($request["username"]) || !isset($request[
     exit;
 }
 
+// RabbitMQ connection parameters
+$host = '100.93.130.48';   // Replace with your RabbitMQ server's IP address
+$port = 5672;              // Default RabbitMQ port
+$user = 'guest';           // Default RabbitMQ username
+$password = 'guest';       // Default RabbitMQ password
+$vhost = '/';              // Default vhost
+
 // Create RabbitMQ client instance
-$client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
+$client = new rabbitMQClient(null, "testServer", $host, $port, $user, $password, $vhost);
 
 // Prepare request for RabbitMQ
 $rabbit_request = [
@@ -42,3 +49,4 @@ error_log("RabbitMQ response: " . json_encode($response));
 echo json_encode($response);
 exit;
 ?>
+
