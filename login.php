@@ -1,11 +1,11 @@
 <?php
 
 // Include RabbitMQ library (needed for messaging system)
-require_once('path.inc');
-require_once('get_host_info.inc');
-require_once('rabbitMQLib.inc');
+require_once('path.inc'); //loads path configuration, found on W3
+require_once('get_host_info.inc'); // loads host details
+require_once('rabbitMQLib.inc'); // loads rabbitMQ client function
 
-// Only accept POST requests
+// Only accept POST requests ensures security 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     echo json_encode(['returnCode' => 'failure', 'message' => 'Invalid request method']);
     exit;
@@ -20,12 +20,12 @@ if (!isset($request["type"]) || !isset($request["username"]) || !isset($request[
     exit;
 }
 
-// Create RabbitMQ client instance
+// connects to rabbitMQ by creating RabbitMQ client instance
 $client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
 
 // Prepare request for RabbitMQ
 $rabbit_request = [
-    "type" => "login", // Tells the server it's a login request
+    "type" => "login", // Tells rabbitmq its a login request 
     "username" => $request["username"],
     "password" => $request["password"]
 ];
