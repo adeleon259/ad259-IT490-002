@@ -16,9 +16,9 @@
 
         // Function to send login request
         function sendLoginRequest(username, password) {
-            var request = new XMLHttpRequest();
+            var request = new XMLHttpRequest(); //Allows browser to make request to server without refreshing the page
             request.open("POST", "login.php", true); // Open a POST request to login.php
-            request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded"); //The data is sent as key=value pairs
             
             request.onreadystatechange = function () {
                 if (this.readyState == 4 && this.status == 200) {
@@ -33,6 +33,18 @@
 </head>
 <body>
     <h1>Login Page</h1>
+    
+    <!-- Display login response messages -->
+    <div id="textResponse">Please Sign In</div>
+    
+    <!-- Login Form -->
+    <form onsubmit="event.preventDefault(); sendLoginRequest(document.getElementById('username').value, document.getElementById('password').value);">
+        <input type="text" id="username" placeholder="Username" required><br>
+        <input type="password" id="password" placeholder="Password" required><br>
+        <button type="submit">Login</button>
+    </form>
+</body>
+</html>
     
     <!-- Display login response messages -->
     <div id="textResponse">Awaiting response...</div>
