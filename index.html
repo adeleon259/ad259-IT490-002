@@ -19,7 +19,7 @@
 </form>
 
 <!-- This area will display the server response -->
-<div id="textResponse">Please enter your information</div>
+<div id="textResponse">Awaiting response...</div>
 
 <script>
 /**
@@ -52,7 +52,7 @@ function SendLoginRequest() {
     request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 
     request.onreadystatechange = function () {
-        if (this.readyState === 4 && this.status === 200) { //4 request has finished processing 200 request was successful
+        if (this.readyState === 4 && this.status === 200) { // 4 request has finished processing 200 request was successful
             HandleLoginResponse(this.responseText); // Handle server response
         }
     };
