@@ -5,7 +5,7 @@ session_start();
 // Database connection details
 $host = "100.93.130.48";
 $dbname = "moveDB";
-$user = "";  // Ask about database user name 
+$user = "mjn92";  // Ask about database user name 
 $pass = "";      // If there is a username check for password for DB
 
 // Connect to MySQL database
