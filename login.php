@@ -24,12 +24,20 @@ if (!isset($request["type"]) || !isset($request["username"]) || !isset($request[
 }
 
 // Create RabbitMQ client instance and manually set the IP
-$client = new rabbitMQClient(null, null); // Create client without ini file
-$client->host = $rabbitmq_server_ip; // Set RabbitMQ server IP
-$client->port = 5672; // Default RabbitMQ port
-$client->user = "guest"; // RabbitMQ username (change if needed)
-$client->password = "guest"; // RabbitMQ password (change if needed)
-$client->vhost = "/"; // Default virtual host
+try {
+    $client = new rabbitMQClient(null, null);
+    $client->host = '100.89.105.111';
+    $client->port = 5672;
+    $client->user = 'guest';
+    $client->password = 'guest';
+    $client->vhost = '/';
+    $test_request = array("type" => "test", "message" => "Hello RabbitMQ");
+    $response = $client->send_request($test_request);
+    echo "Connected successfully. Received response: " . json_encode($response);
+} catch (Exception $e) {
+    echo "Connection failed: " . $e->getMessage();
+}
+?>
 
 // Prepare request for RabbitMQ
 $rabbit_request = [
