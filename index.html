@@ -58,9 +58,10 @@ function SendLoginRequest() {
     };
 
     // Send username and password to the backend
-    request.send("type=login&username=" + encodeURIComponent(username) + "&password=" + encodeURIComponent(password));
+    request.send("username=" + encodeURIComponent(username) + "&password=" + encodeURIComponent(password));
 }
 </script>
 
 </body>
 </html>
+
