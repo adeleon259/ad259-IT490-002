@@ -1,9 +1,9 @@
 <?php
 // Database connection details
-$host = "localhost";
-$dbname = "user_auth";
-$user = "root";  // Change this if needed
-$pass = "";      // Change this if needed
+$host = "100.93.130.48";
+$dbname = "moveDB";
+$user = "TeamDog123";  // Username of DB
+$pass = "TeamDog123";      // Password of DB
 
 // Connect to the database
 $conn = new mysqli($host, $user, $pass, $dbname);
