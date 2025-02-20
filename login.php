@@ -1,5 +1,6 @@
 <?php
-// Include RabbitMQ library
+
+// Include RabbitMQ library (needed for messaging system)
 require_once('path.inc');
 require_once('get_host_info.inc');
 require_once('rabbitMQLib.inc');
@@ -13,24 +14,25 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 // Read the data sent from the frontend
 $request = $_POST;
 
-// Debug: check if the request is received correctly
-error_log("Received request: " . json_encode($request));
-
-// Make sure all required fields are present
+// Ensures input validation. Makes sure all required fields are provided
 if (!isset($request["type"]) || !isset($request["username"]) || !isset($request["password"])) {
     echo json_encode(['returnCode' => 'failure', 'message' => 'Missing required fields']);
     exit;
 }
 
-// RabbitMQ connection parameters
-$host = '100.93.130.48';   // Replace with your RabbitMQ server's IP address
-$port = 5672;              // Default RabbitMQ port
-$user = 'guest';           // Default RabbitMQ username
-$password = 'guest';       // Default RabbitMQ password
-$vhost = '/';              // Default vhost
+// Try creating a RabbitMQ client instance and check for any connection errors
+try {
+    // Establish connection with the RabbitMQ server
+    $client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
 
-// Create RabbitMQ client instance
-$client = new rabbitMQClient(null, "testServer", $host, $port, $user, $password, $vhost);
+    // If the client is successfully created, log this as a success
+    error_log("RabbitMQ client connected successfully.");
+} catch (Exception $e) {
+    // Catch any connection errors and log the error
+    error_log("Error connecting to RabbitMQ: " . $e->getMessage());
+    echo json_encode(['returnCode' => 'failure', 'message' => 'Failed to connect to RabbitMQ']);
+    exit;
+}
 
 // Prepare request for RabbitMQ
 $rabbit_request = [
@@ -42,8 +44,8 @@ $rabbit_request = [
 // Send request to RabbitMQ and wait for response
 $response = $client->send_request($rabbit_request);
 
-// Debug: check the response from RabbitMQ
-error_log("RabbitMQ response: " . json_encode($response));
+// Debug: Log the response from RabbitMQ
+error_log("RabbitMQ Response: " . json_encode($response));
 
 // Send the response back to the frontend as JSON
 echo json_encode($response);
