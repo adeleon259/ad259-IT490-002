@@ -1,11 +1,14 @@
 <?php
 
-// Include RabbitMQ library (needed for messaging system)
-require_once('path.inc'); //loads path configuration, found on W3
-require_once('get_host_info.inc'); // loads host details
-require_once('rabbitMQLib.inc'); // loads rabbitMQ client function
+// Include RabbitMQ library
+require_once('path.inc');
+require_once('get_host_info.inc');
+require_once('rabbitMQLib.inc');
 
-// Only accept POST requests ensures security 
+// Define RabbitMQ server IP address
+$rabbitmq_server_ip = "100.89.105.111"; // RabbitMQ IP
+
+// Only accept POST requests
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     echo json_encode(['returnCode' => 'failure', 'message' => 'Invalid request method']);
     exit;
@@ -20,12 +23,17 @@ if (!isset($request["type"]) || !isset($request["username"]) || !isset($request[
     exit;
 }
 
-// connects to rabbitMQ by creating RabbitMQ client instance
-$client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
+// Create RabbitMQ client instance and manually set the IP
+$client = new rabbitMQClient(null, null); // Create client without ini file
+$client->host = $rabbitmq_server_ip; // Set RabbitMQ server IP
+$client->port = 5672; // Default RabbitMQ port
+$client->user = "guest"; // RabbitMQ username (change if needed)
+$client->password = "guest"; // RabbitMQ password (change if needed)
+$client->vhost = "/"; // Default virtual host
 
 // Prepare request for RabbitMQ
 $rabbit_request = [
-    "type" => "login", // Tells rabbitmq its a login request 
+    "type" => "login", // Tells the server it's a login request
     "username" => $request["username"],
     "password" => $request["password"]
 ];
@@ -36,4 +44,5 @@ $response = $client->send_request($rabbit_request);
 // Send the response back to the frontend as JSON
 echo json_encode($response);
 exit;
+
 ?>
