@@ -33,6 +33,9 @@ function HandleLoginResponse(response) {
         // Redirect if login is successful
         if (jsonResponse.returnCode === "success") {
             window.location.href = "dashboard.html"; // Redirect to a dashboard page
+        } else {
+            // Display failure message if login was not successful
+            document.getElementById("textResponse").innerHTML = "Login failed: " + jsonResponse.message;
         }
     } catch (error) {
         console.error("Error parsing response:", error);
@@ -54,6 +57,9 @@ function SendLoginRequest() {
     request.onreadystatechange = function () {
         if (this.readyState === 4 && this.status === 200) { //4 request has finished processing 200 request was successful
             HandleLoginResponse(this.responseText); // Handle server response
+        } else if (this.readyState === 4 && this.status !== 200) {
+            // Handle server errors (e.g., connection issue with RabbitMQ)
+            document.getElementById("textResponse").innerHTML = "Error: Unable to connect to the server.";
         }
     };
 
@@ -64,4 +70,3 @@ function SendLoginRequest() {
 
 </body>
 </html>
-
