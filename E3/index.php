@@ -47,7 +47,7 @@
 </html>
     
     <!-- Display login response messages -->
-    <div id="textResponse">Awaiting response...</div>
+    <div id="textResponse">Please Enter Name and Password</div>
     
     <!-- Login Form -->
     <form onsubmit="event.preventDefault(); sendLoginRequest(document.getElementById('username').value, document.getElementById('password').value);">
