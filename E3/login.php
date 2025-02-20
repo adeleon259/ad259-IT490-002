@@ -3,10 +3,10 @@
 session_start();
 
 // Database connection details
-$host = "100.93.130.48";
-$dbname = "moveDB";
-$user = "mjn92";  // Ask about database user name 
-$pass = "";      // If there is a username check for password for DB
+$host = "100.93.130.48"; //IP for DB
+$dbname = "moveDB";  //DB Name 
+$user = "TeamDog123";  // Username for DB
+$pass = "TeamDog123";      // Password for DB
 
 // Connect to MySQL database
 $conn = new mysqli($host, $user, $pass, $dbname);
