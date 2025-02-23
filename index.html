@@ -1,43 +1,26 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-    <script>
-        function loginUser(event) {
-            event.preventDefault(); // Prevent page reload
+<html>
+<script>
+function HandleLoginResponse(response) {
+    var text = JSON.parse(response);
+    document.getElementById("textResponse").innerHTML = "Response: " + text.message + "<p>";
+}
 
-            let username = document.getElementById("username").value;
-            let password = document.getElementById("password").value;
-
-            fetch("login.php", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ username: username, password: password })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.returnCode === "success") {
-                    alert("Login Successful!");
-                } else {
-                    alert("Login Failed! Check your credentials.");
-                }
-            })
-            .catch(error => console.error("Error:", error));
+function SendLoginRequest(username, password) {
+    var request = new XMLHttpRequest();
+    request.open("POST", "login.php", true);
+    request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    request.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+            HandleLoginResponse(this.responseText);
         }
-    </script>
-</head>
+    };
+    request.send("uname=" + encodeURIComponent(username) + "&pword=" + encodeURIComponent(password));
+}
+</script>
+
+<h1>Login Page</h1>
 <body>
-    <h2>Login</h2>
-    <form onsubmit="loginUser(event)">
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" required>
-        <br>
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required>
-        <br>
-        <button type="submit">Login</button>
-    </form>
+    <div id="textResponse">Awaiting response...</div>
+    <button onclick="SendLoginRequest('kehoed', '12345')">Login</button>
 </body>
 </html>
