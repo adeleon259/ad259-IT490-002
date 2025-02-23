@@ -1,23 +1,21 @@
 <?php
+require_once('path.inc');
+require_once('get_host_info.inc');
 require_once('rabbitMQLib.inc');
 
-$username = $_POST['username'];
-$password = $_POST['password'];
-
-$request = array();
-$request['type'] = "login";
-$request['username'] = $username;
-$request['password'] = $password;
+$data = json_decode(file_get_contents("php://input"), true);
+$username = $data['username'];
+$password = $data['password'];
 
 $client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
+
+$request = array(
+    "type" => "login",
+    "username" => $username,
+    "password" => $password
+);
+
 $response = $client->send_request($request);
 
-if ($response['returnCode'] == "success") {
-    session_start();
-    $_SESSION['username'] = $username;
-    $_SESSION['session_token'] = $response['session_token'];
-    echo "Login successful!";
-} else {
-    echo "Login failed: " . $response['message'];
-}
+echo json_encode($response);
 ?>
