@@ -1,26 +1,46 @@
+<!DOCTYPE html>
 <html>
-<script>
-function HandleLoginResponse(response) {
-    var text = JSON.parse(response);
-    document.getElementById("textResponse").innerHTML = "Response: " + text.message + "<p>";
-}
-
-function SendLoginRequest(username, password) {
-    var request = new XMLHttpRequest();
-    request.open("POST", "login.php", true);
-    request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-    request.onreadystatechange = function () {
-        if (this.readyState == 4 && this.status == 200) {
-            HandleLoginResponse(this.responseText);
+<head>
+    <title>Login Page</title>
+    <script>
+        function HandleLoginResponse(response) {
+            var text = JSON.parse(response);
+            document.getElementById("textResponse").innerHTML = "Response: " + text.message;
         }
-    };
-    request.send("uname=" + encodeURIComponent(username) + "&pword=" + encodeURIComponent(password));
-}
-</script>
 
-<h1>Login Page</h1>
+        function SendLoginRequest() {
+            // Get the username and password from the form
+            var username = document.getElementById("username").value;
+            var password = document.getElementById("password").value;
+
+            var request = new XMLHttpRequest();
+            request.open("POST", "login.php", true);
+            request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            request.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    HandleLoginResponse(this.responseText);
+                }
+            };
+
+            // Send the login request with the username and password
+            request.send("type=login&uname=" + username + "&pword=" + password);
+        }
+    </script>
+</head>
 <body>
+    <h1>Login Page</h1>
     <div id="textResponse">Awaiting response...</div>
-    <button onclick="SendLoginRequest('kehoed', '12345')">Login</button>
+
+    <!-- Create the form for user input -->
+    <form onsubmit="event.preventDefault(); SendLoginRequest();">
+        <label for="username">Username:</label><br>
+        <input type="text" id="username" name="username" required><br><br>
+        
+        <label for="password">Password:</label><br>
+        <input type="password" id="password" name="password" required><br><br>
+
+        <button type="submit">Login</button>
+    </form>
 </body>
 </html>
+
