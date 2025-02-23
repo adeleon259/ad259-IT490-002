@@ -1,21 +1,21 @@
 <?php
-require_once('path.inc');
-require_once('get_host_info.inc');
-require_once('rabbitMQLib.inc');
+if (!isset($_POST) || !isset($_POST['uname']) || !isset($_POST['pword'])) {
+    echo json_encode(["message" => "Invalid input data"]);
+    exit(0);
+}
 
-$data = json_decode(file_get_contents("php://input"), true);
-$username = $data['username'];
-$password = $data['password'];
+$username = $_POST['uname'];
+$password = $_POST['pword'];
+
+$request = [
+    'type' => 'login',
+    'username' => $username,
+    'password' => $password
+];
 
 $client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
-
-$request = array(
-    "type" => "login",
-    "username" => $username,
-    "password" => $password
-);
-
 $response = $client->send_request($request);
 
 echo json_encode($response);
+exit(0);
 ?>
