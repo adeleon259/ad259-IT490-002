@@ -47,3 +47,4 @@ function SendLoginRequestToRabbitMQ($username, $password) {
     }
 }
 ?>
+
