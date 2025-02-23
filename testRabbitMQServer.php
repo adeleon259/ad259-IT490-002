@@ -6,43 +6,34 @@ require_once('rabbitMQLib.inc');
 
 function doLogin($username, $password)
 {
-    $host = "100.93.130.48";  // Database host
-    $dbuser = "mjn92";        // Database user
-    $dbpass = "";             // Database password
-    $dbname = "";  // Database name
+    // Database connection parameters
+    $host = "100.93.130.48";  // Your MySQL server IP address
+    $dbuser = "mjn92";         // Your MySQL username
+    $dbpass = "";              // Your MySQL password
+    $dbname = "movDB";         // Your database name
 
-    // Create a MySQL connection
+    // Create a connection to the MySQL database
     $conn = new mysqli($host, $dbuser, $dbpass, $dbname);
-    
+
+    // Check for connection errors
     if ($conn->connect_error) {
-        return array('returnCode' => 'failure', 'message' => 'Database connection failed');
+        return array('returnCode' => 'failure', 'message' => 'Connection failed: ' . $conn->connect_error);
     }
 
-    // Prepare the query to fetch the user by username
+    // Prepare statement to avoid SQL injection
     $stmt = $conn->prepare("SELECT * FROM users WHERE username = ?");
     $stmt->bind_param("s", $username);
     $stmt->execute();
     $result = $stmt->get_result();
-    
-    if ($result->num_rows > 0) {
-        // Fetch the user record
-        $user = $result->fetch_assoc();
-        
-        // Verify the password using password_verify
-        if (password_verify($password, $user['password'])) {
-            // If valid password
-            return array('returnCode' => 'success', 'message' => 'Login successful');
-        } else {
-            // If invalid password
-            return array('returnCode' => 'failure', 'message' => 'Invalid password');
-        }
-    } else {
-        // If no user found
-        return array('returnCode' => 'failure', 'message' => 'User not found');
-    }
 
-    // Close the database connection
-    $conn->close();
+    // Fetch the user and check the password
+    if ($result->num_rows > 0) {
+        $user = $result->fetch_assoc();
+        if (password_verify($password, $user['password'])) { // Use password_verify for hashed passwords
+            return array('returnCode' => 'success', 'message' => 'Login successful');
+        }
+    }
+    return array('returnCode' => 'failure', 'message' => 'Login failed');
 }
 
 function doValidate($sessionId)
@@ -55,11 +46,11 @@ function doValidate($sessionId)
 
 function requestProcessor($request)
 {
-    echo "Received request" . PHP_EOL;
+    echo "Received request".PHP_EOL;
     var_dump($request);
-
+    
     if (!isset($request['type'])) {
-        return "ERROR: Unsupported message type";
+        return "ERROR: unsupported message type";
     }
 
     switch ($request['type']) {
@@ -67,13 +58,14 @@ function requestProcessor($request)
             return doLogin($request['username'], $request['password']);
         case "validate_session":
             return doValidate($request['sessionId']);
-        default:
-            return array("returnCode" => '0', 'message' => "Server received request and processed");
     }
+    
+    return array("returnCode" => '0', 'message' => "Server received request and processed");
 }
 
-// Create a RabbitMQ server and process requests
+// Initialize RabbitMQ server
 $server = new rabbitMQServer("testRabbitMQ.ini", "testServer");
 $server->process_requests('requestProcessor');
 exit();
 ?>
+
