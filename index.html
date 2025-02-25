@@ -1,41 +1,48 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <title>Login Page</title>
-    <script>
-        function HandleLoginResponse(response) {
-            var text = JSON.parse(response);
-
-            // Display login response
-            if (text.returnCode === "success") {
-                document.getElementById("textResponse").innerHTML = "✅ Login successful! Welcome.";
-            } else {
-                document.getElementById("textResponse").innerHTML = "❌ Login failed. Please check your credentials.";
-            }
-        }
-
-        function SendLoginRequest(username, password) {
-            var request = new XMLHttpRequest();
-            request.open("POST", "login.php", true);
-            request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-            request.onreadystatechange = function () {
-                if (this.readyState == 4 && this.status == 200) {
-                    HandleLoginResponse(this.responseText);
-                }
-            };
-            request.send("uname=" + encodeURIComponent(username) + "&pword=" + encodeURIComponent(password));
-        }
-    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
 </head>
 <body>
-    <h1>Login Page</h1>
-    <div id="textResponse">Awaiting response...</div>
-    <br>
-    <input type="text" id="username" placeholder="Username">
-    <input type="password" id="password" placeholder="Password">
-    <button onclick="SendLoginRequest(document.getElementById('username').value, document.getElementById('password').value)">Login</button>
+    <h2>Login</h2>
+    <form id="loginForm">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required><br><br>
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required><br><br>
+
+        <input type="submit" value="Login">
+    </form>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            // Send login data to server via fetch
+            fetch('login.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username: username, password: password })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.returnCode === 'success') {
+                    window.location.href = 'dashboard.php'; // Redirect to dashboard
+                } else {
+                    alert(data.message); // Show failure message
+                    window.location.href = 'register.php'; // Redirect to registration page if user is not found
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    </script>
 </body>
 </html>
-
-
-
-
