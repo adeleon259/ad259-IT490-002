@@ -1,57 +1,41 @@
-<!DOCTYPE html>
 <html>
 <head>
     <title>Login Page</title>
     <script>
         function HandleLoginResponse(response) {
-            try {
-                var text = JSON.parse(response);
+            var text = JSON.parse(response);
 
-                if (text.returnCode === "success") {
-                    localStorage.setItem("sessionId", text.sessionId);
-                    document.getElementById("textResponse").innerHTML = "✅ " + text.message;
-                } else {
-                    document.getElementById("textResponse").innerHTML = "❌ " + text.message;
-                }
-            } catch (error) {
-                document.getElementById("textResponse").innerHTML = "⚠️ Error processing response.";
+            // Display login response
+            if (text.returnCode === "success") {
+                document.getElementById("textResponse").innerHTML = "✅ Login successful! Welcome.";
+            } else {
+                document.getElementById("textResponse").innerHTML = "❌ Login failed. Please check your credentials.";
             }
         }
 
-        function SendLoginRequest() {
-            var username = document.getElementById("username").value;
-            var password = document.getElementById("password").value;
-
+        function SendLoginRequest(username, password) {
             var request = new XMLHttpRequest();
             request.open("POST", "login.php", true);
             request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-
             request.onreadystatechange = function () {
                 if (this.readyState == 4 && this.status == 200) {
                     HandleLoginResponse(this.responseText);
                 }
             };
-
-            request.send("type=login&uname=" + encodeURIComponent(username) + "&pword=" + encodeURIComponent(password));
+            request.send("uname=" + encodeURIComponent(username) + "&pword=" + encodeURIComponent(password));
         }
     </script>
 </head>
 <body>
     <h1>Login Page</h1>
-    
-    <form onsubmit="event.preventDefault(); SendLoginRequest();">
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" required>
-        <br>
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required>
-        <br>
-        <button type="submit">Login</button>
-    </form>
-
-    <div id="textResponse"></div>
+    <div id="textResponse">Awaiting response...</div>
+    <br>
+    <input type="text" id="username" placeholder="Username">
+    <input type="password" id="password" placeholder="Password">
+    <button onclick="SendLoginRequest(document.getElementById('username').value, document.getElementById('password').value)">Login</button>
 </body>
 </html>
+
 
 
 
