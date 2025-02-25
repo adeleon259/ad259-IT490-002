@@ -1,10 +1,14 @@
+<!DOCTYPE html>
 <html>
 <head>
+    <title>Login Page</title>
     <script>
         function HandleLoginResponse(response) {
             try {
                 var text = JSON.parse(response);
+
                 if (text.returnCode === "success") {
+                    localStorage.setItem("sessionId", text.sessionId);
                     document.getElementById("textResponse").innerHTML = "✅ " + text.message;
                 } else {
                     document.getElementById("textResponse").innerHTML = "❌ " + text.message;
@@ -14,7 +18,10 @@
             }
         }
 
-        function SendLoginRequest(username, password) {
+        function SendLoginRequest() {
+            var username = document.getElementById("username").value;
+            var password = document.getElementById("password").value;
+
             var request = new XMLHttpRequest();
             request.open("POST", "login.php", true);
             request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
@@ -24,19 +31,27 @@
                     HandleLoginResponse(this.responseText);
                 }
             };
-            
+
             request.send("type=login&uname=" + encodeURIComponent(username) + "&pword=" + encodeURIComponent(password));
         }
     </script>
 </head>
 <body>
     <h1>Login Page</h1>
-    <div id="textResponse">Awaiting response...</div>
+    
+    <form onsubmit="event.preventDefault(); SendLoginRequest();">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required>
+        <br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+        <br>
+        <button type="submit">Login</button>
+    </form>
 
-    <script>
-        SendLoginRequest("kehoed", "12345");
-    </script>
+    <div id="textResponse"></div>
 </body>
 </html>
+
 
 
