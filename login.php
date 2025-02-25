@@ -1,56 +1,45 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
 require_once('path.inc');
 require_once('get_host_info.inc');
 require_once('rabbitMQLib.inc');
 
-// Check if username and password are provided
-if (!isset($_POST['uname']) || !isset($_POST['pword'])) {
-    $response = array('returnCode' => 'error', 'message' => 'Missing username or password');
-    echo json_encode($response);
-    exit();
-}
-
-$username = $_POST['uname'];
-$password = $_POST['pword'];
-
-echo "Received login request for user: " . $username . "<br>";
-
-// Create a new RabbitMQ client
-try {
-    $client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
-    if (!$client) {
-        throw new Exception("Failed to create RabbitMQ client.");
+function doLogin($username, $password)
+{
+    // MySQL database connection details
+    $host = "100.93.130.48";
+    $dbuser = "TeamDog123";
+    $dbpass = "TeamDog123";
+    $dbname = "users";
+    
+    // Connect to MySQL database
+    $conn = new mysqli($host, $dbuser, $dbpass, $dbname);
+    if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
     }
-} catch (Exception $e) {
-    echo json_encode(array("returnCode" => "error", "message" => "RabbitMQ client error: " . $e->getMessage()));
-    exit();
-}
 
-// Prepare the request
-$request = array();
-$request['type'] = "login";
-$request['username'] = $username;
-$request['password'] = $password;
+    // Prepare and execute the query
+    $stmt = $conn->prepare("SELECT * FROM users WHERE username = ? AND password = ?");
+    $stmt->bind_param("ss", $username, $password);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
-// Send request to RabbitMQ server
-try {
-    $response = $client->send_request($request);
-
-    if (!$response) {
-        throw new Exception("No response from RabbitMQ.");
+    if ($result->num_rows > 0) {
+        // Login successful, return success message
+        return array('returnCode' => 'success', 'message' => 'Login successful');
+    } else {
+        // Login failed, return failure message
+        return array('returnCode' => 'failure', 'message' => 'Login failed');
     }
-} catch (Exception $e) {
-    echo json_encode(array("returnCode" => "error", "message" => "RabbitMQ request error: " . $e->getMessage()));
-    exit();
+
+    // Close the database connection
+    $conn->close();
 }
 
-// Debugging output: show response from RabbitMQ
-echo "Response from RabbitMQ: ";
-print_r($response);
-
-echo json_encode($response);
-exit();
+$request = json_decode(file_get_contents('php://input'), true);
+if (isset($request['username']) && isset($request['password'])) {
+    echo json_encode(doLogin($request['username'], $request['password']));
+} else {
+    echo json_encode(array('returnCode' => 'failure', 'message' => 'Invalid request'));
+}
 ?>
+
