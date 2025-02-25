@@ -3,43 +3,43 @@ require_once('path.inc');
 require_once('get_host_info.inc');
 require_once('rabbitMQLib.inc');
 
-function doLogin($username, $password)
+// Function to send login data to RabbitMQ
+function sendToRabbitMQ($username, $password)
 {
-    // MySQL database connection details
-    $host = "100.93.130.48";
-    $dbuser = "TeamDog123";
-    $dbpass = "TeamDog123";
-    $dbname = "users";
-    
-    // Connect to MySQL database
-    $conn = new mysqli($host, $dbuser, $dbpass, $dbname);
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
+    $client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
 
-    // Prepare and execute the query
-    $stmt = $conn->prepare("SELECT * FROM users WHERE username = ? AND password = ?");
-    $stmt->bind_param("ss", $username, $password);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    // Send login request to RabbitMQ
+    $request = array();
+    $request['type'] = "login";
+    $request['username'] = $username;
+    $request['password'] = $password;
 
-    if ($result->num_rows > 0) {
-        // Login successful, return success message
-        return array('returnCode' => 'success', 'message' => 'Login successful');
-    } else {
-        // Login failed, return failure message
-        return array('returnCode' => 'failure', 'message' => 'Login failed');
-    }
+    // Get response from RabbitMQ
+    $response = $client->send_request($request);
 
-    // Close the database connection
-    $conn->close();
+    return $response;
 }
 
+// Handle the POST request
 $request = json_decode(file_get_contents('php://input'), true);
+
 if (isset($request['username']) && isset($request['password'])) {
-    echo json_encode(doLogin($request['username'], $request['password']));
+    // Get the login details from the request
+    $username = $request['username'];
+    $password = $request['password'];
+
+    // Send the credentials to RabbitMQ and get the response
+    $response = sendToRabbitMQ($username, $password);
+
+    // Check if the login was successful or failed
+    if ($response['returnCode'] === 'success') {
+        echo json_encode(array('returnCode' => 'success', 'message' => 'Login successful'));
+    } else {
+        echo json_encode(array('returnCode' => 'failure', 'message' => 'Login failed'));
+    }
 } else {
     echo json_encode(array('returnCode' => 'failure', 'message' => 'Invalid request'));
 }
 ?>
+
 
