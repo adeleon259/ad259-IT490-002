@@ -3,31 +3,26 @@ require_once('path.inc');
 require_once('get_host_info.inc');
 require_once('rabbitMQLib.inc');
 
-if (!isset($_POST["type"]) || $_POST["type"] !== "login") {
-    echo json_encode(["error" => "Invalid request type"]);
+// Check if username and password are provided
+if (!isset($_POST['uname']) || !isset($_POST['pword'])) {
+    $response = array('returnCode' => 'error', 'message' => 'Missing username or password');
+    echo json_encode($response);
     exit();
 }
 
-// Capture username and password from the frontend
-$username = $_POST["uname"];
-$password = $_POST["pword"];
-
+// Create a new RabbitMQ client
 $client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
 
+// Prepare the request
 $request = array();
 $request['type'] = "login";
-$request['username'] = $username;
-$request['password'] = $password;
+$request['username'] = $_POST['uname'];
+$request['password'] = $_POST['pword'];
 
+// Send request to RabbitMQ server
 $response = $client->send_request($request);
 
-// Ensure response is properly formatted
-if (!is_array($response)) {
-    echo json_encode(["error" => "Invalid server response"]);
-    exit();
-}
-
+// Return the response as JSON
 echo json_encode($response);
 exit();
 ?>
-
