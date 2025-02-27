@@ -1,48 +1,49 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Login Page</title>
 </head>
 <body>
-    <h2>Login</h2>
-    <form id="loginForm">
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" required><br><br>
 
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required><br><br>
+<h1>Login Page</h1>
 
-        <input type="submit" value="Login">
-    </form>
+<form onsubmit="event.preventDefault(); sendLoginRequest();">
+    <label for="username">Username:</label>
+    <input type="text" id="username" required><br>
 
-    <script>
-        document.getElementById('loginForm').addEventListener('submit', function(event) {
-            event.preventDefault();
+    <label for="password">Password:</label>
+    <input type="password" id="password" required><br>
 
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
+    <button type="submit">Login</button>
+</form>
 
-            // Send login data to server via fetch
-            fetch('login.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ username: username, password: password })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.returnCode === 'success') {
-                    window.location.href = 'dashboard.php'; // Redirect to dashboard
-                } else {
-                    alert(data.message); // Show failure message
-                    window.location.href = 'register.php'; // Redirect to registration page if user is not found
-                }
-            })
-            .catch(error => console.error('Error:', error));
-        });
-    </script>
+<div id="textResponse">Please enter your information</div>
+
+<script>
+function sendLoginRequest() {
+    var username = document.getElementById("username").value;
+    var password = document.getElementById("password").value;
+
+    var request = new XMLHttpRequest();
+    request.open("POST", "login.php", true);
+    request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+    request.onreadystatechange = function () {
+        if (this.readyState === 4 && this.status === 200) {
+            var jsonResponse = JSON.parse(this.responseText);
+            document.getElementById("textResponse").innerHTML = jsonResponse.message;
+
+            if (jsonResponse.returnCode === "success") {
+                window.location.href = "home.html"; // Redirect on success
+            } else {
+                window.location.href = "register.html"; // Redirect if user not found
+            }
+        }
+    };
+
+    request.send("username=" + encodeURIComponent(username) + "&password=" + encodeURIComponent(password));
+}
+</script>
+
 </body>
 </html>
