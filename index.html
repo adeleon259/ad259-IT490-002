@@ -8,7 +8,7 @@
 <h1>Login Page</h1>
 
 <form onsubmit="event.preventDefault(); sendLoginRequest();">
-    <label for="username">Username:</label>
+    <label for="username">Usernameeeee:</label>
     <input type="text" id="username" required><br>
 
     <label for="password">Password:</label>
@@ -31,13 +31,15 @@ function sendLoginRequest() {
     request.onreadystatechange = function () {
         if (this.readyState === 4 && this.status === 200) {
             var jsonResponse = JSON.parse(this.responseText);
+                var returncode = jsonResponse.returnCode;
+                var message = jsonResponse.message;
             document.getElementById("textResponse").innerHTML = jsonResponse.message;
 
-            if (jsonResponse.returnCode === "success") {
+                if (returncode === 0) {
                 window.location.href = "home.html"; // Redirect on success
             } else {
                 window.location.href = "register.html"; // Redirect if user not found
-            }
+          }
         }
     };
 
@@ -47,3 +49,4 @@ function sendLoginRequest() {
 
 </body>
 </html>
+
