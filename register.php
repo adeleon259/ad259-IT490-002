@@ -1,58 +1,36 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register</title>
-</head>
-<body>
-    <h2>Create a New Account</h2>
-    <form id="registerForm">
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" required><br><br>
+<?php
+require_once('path.inc');
+require_once('get_host_info.inc');
+require_once('rabbitMQLib.inc');
 
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required><br><br>
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    echo json_encode(['returnCode' => 'failure', 'message' => 'Invalid request']);
+    exit;
+}
 
-        <label for="confirmPassword">Confirm Password:</label>
-        <input type="password" id="confirmPassword" name="confirmPassword" required><br><br>
+// Get user input
+$username = $_POST['username'];
+$password = $_POST['password']; // The password should be the hashed password sent from the frontend
 
-        <input type="submit" value="Register">
-    </form>
+// Hash the password before storing it in the database
+$hashedPassword = $password; // Since the frontend already hashed the password, no need to hash again
 
-    <script>
-        document.getElementById('registerForm').addEventListener('submit', function(event) {
-            event.preventDefault();
+// Create RabbitMQ client instance
+$client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
 
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
+// Prepare request for RabbitMQ
+$request = array();
+$request['type'] = "register";
+$request['username'] = $username;
+$request['password'] = $hashedPassword;
 
-            // Check if passwords match
-            if (password !== confirmPassword) {
-                alert("Passwords do not match!");
-                return;
-            }
+// Send request and get response
+$response = $client->send_request($request);
 
-            // Send registration data to server via fetch
-            fetch('register_user.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ username: username, password: password })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.returnCode === 'success') {
-                    alert('Registration successful! You can now log in.');
-                    window.location.href = 'login.php'; // Redirect to login page
-                } else {
-                    alert('Registration failed: ' + data.message); // Show error message
-                }
-            })
-            .catch(error => console.error('Error:', error));
-        });
-    </script>
-</body>
-</html>
+// Log response for debugging
+error_log("RabbitMQ response: " . json_encode($response));
+
+// Send response back to frontend
+echo json_encode($response);
+?>
+
