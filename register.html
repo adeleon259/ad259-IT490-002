@@ -1,10 +1,61 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Home Page</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bcryptjs/2.4.3/bcrypt.min.js"></script> <!-- Include bcrypt.js for password hashing -->
 </head>
 <body>
-    <h1>Welcome to Home Page</h1>
-    <p>You have successfully logged in.</p>
+
+<h1>Register</h1>
+
+<form onsubmit="event.preventDefault(); sendRegisterRequest();">
+    <label for="username">Username:</label>
+    <input type="text" id="username" required><br>
+
+    <label for="password">Password:</label>
+    <input type="password" id="password" required><br>
+
+    <button type="submit">Register</button>
+</form>
+
+<div id="textResponse">Please enter your details to register</div>
+
+<script>
+function sendRegisterRequest() {
+    var username = document.getElementById("username").value;
+    var password = document.getElementById("password").value;
+
+    //hash using bcrypt to hash password from the client side
+    bcrypt.hash(password, 10, function(err, hashedPassword) {
+        if (err) {
+            console.error("Error hashing password", err);
+            return;
+        }
+
+        var request = new XMLHttpRequest();
+        request.open("POST", "register.php", true);
+        request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+        request.onreadystatechange = function () {
+            if (this.readyState === 4 && this.status === 200) {
+                var jsonResponse = JSON.parse(this.responseText);
+                var returncode = jsonResponse.returnCode;
+                var message = jsonResponse.message;
+                document.getElementById("textResponse").innerHTML = message;
+
+                if (returncode === 0) {
+                    window.location.href = "login.html"; // Redirect to login page on success
+                }
+            }
+        };
+
+        // Send the username and hashed password to the server
+        request.send("username=" + encodeURIComponent(username) + "&password=" + encodeURIComponent(hashedPassword));
+    });
+}
+</script>
+
 </body>
 </html>
