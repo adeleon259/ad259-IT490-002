@@ -30,3 +30,4 @@ error_log("RabbitMQ response: " . json_encode($response));
 // Send response back to frontend
 echo json_encode($response);
 ?>
+
