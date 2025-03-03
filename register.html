@@ -1,15 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bcryptjs/2.4.3/bcrypt.min.js"></script> <!-- Include bcrypt.js for password hashing -->
+    <title>Register Page</title>
 </head>
 <body>
 
 <h1>Register</h1>
 
+<!-- Registration form -->
 <form onsubmit="event.preventDefault(); sendRegisterRequest();">
     <label for="username">Username:</label>
     <input type="text" id="username" required><br>
@@ -20,42 +18,43 @@
     <button type="submit">Register</button>
 </form>
 
-<div id="textResponse">Please enter your details to register</div>
+<!-- Area to display response messages -->
+<div id="textResponse">Please enter your details</div>
 
 <script>
 function sendRegisterRequest() {
+    // Get username and password from input fields
     var username = document.getElementById("username").value;
     var password = document.getElementById("password").value;
 
-    //hash using bcrypt to hash password from the client side
-    bcrypt.hash(password, 10, function(err, hashedPassword) {
-        if (err) {
-            console.error("Error hashing password", err);
-            return;
-        }
+    // Create an AJAX request to send the registration data to register.php
+    var request = new XMLHttpRequest();
+    request.open("POST", "register.php", true);
+    request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 
-        var request = new XMLHttpRequest();
-        request.open("POST", "register.php", true);
-        request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    // Handle the server response
+    request.onreadystatechange = function () {
+        if (this.readyState === 4 && this.status === 200) {
+            // Convert the JSON response into a JavaScript object
+            var jsonResponse = JSON.parse(this.responseText);
+            var returncode = jsonResponse.returnCode;
+            var message = jsonResponse.message;
 
-        request.onreadystatechange = function () {
-            if (this.readyState === 4 && this.status === 200) {
-                var jsonResponse = JSON.parse(this.responseText);
-                var returncode = jsonResponse.returnCode;
-                var message = jsonResponse.message;
-                document.getElementById("textResponse").innerHTML = message;
+            // Display response message
+            document.getElementById("textResponse").innerHTML = message;
 
-                if (returncode === 0) {
-                    window.location.href = "login.html"; // Redirect to login page on success
-                }
+            // If registration is successful, redirect to home.html
+            if (returncode === "success") {
+                window.location.href = "home.html";
             }
-        };
+        }
+    };
 
-        // Send the username and hashed password to the server
-        request.send("username=" + encodeURIComponent(username) + "&password=" + encodeURIComponent(hashedPassword));
-    });
+    // Send the username and password to the PHP script
+    request.send("username=" + encodeURIComponent(username) + "&password=" + encodeURIComponent(password));
 }
 </script>
 
 </body>
 </html>
+
