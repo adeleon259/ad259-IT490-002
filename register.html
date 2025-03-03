@@ -44,7 +44,7 @@ function sendRegisterRequest() {
             document.getElementById("textResponse").innerHTML = message;
 
             // If registration is successful, redirect to home.html
-            if (returncode === "success") {
+            if (returncode === 0) {
                 window.location.href = "home.html";
             }
         }
