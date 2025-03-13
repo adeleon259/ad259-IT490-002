@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Browse Movies</title>
+</head>
+<body>
+
+<h1>Movie Search</h1>
+
+<!-- Search Bar -->
+<input type="text" id="searchQuery" placeholder="Search for a movie">
+<button onclick="searchMovies()">Search</button>
+
+<!-- Display Movie Results -->
+<div id="movieResults"></div>
+
+<script>
+function searchMovies() {
+    var query = document.getElementById("searchQuery").value;
+    if (!query) {
+        alert("Please enter a search term.");
+        return;
+    }
+
+    // Fetch movies from your API
+    fetch("YOUR_API_ENDPOINT?query=" + encodeURIComponent(query))
+    .then(response => response.json())
+    .then(data => {
+        var movies = data.results; // Adjust based on API response structure
+        var resultsContainer = document.getElementById("movieResults");
+        resultsContainer.innerHTML = ""; // Clear previous results
+
+        movies.forEach(movie => {
+            var movieElement = document.createElement("div");
+            movieElement.innerHTML = `
+                <h3>${movie.title}</h3>
+                <img src="${movie.poster}" alt="${movie.title}" width="100">
+                <p>${movie.description}</p>
+                <a href="movie.html?id=${movie.id}">View Details</a>
+                <hr>
+            `;
+            resultsContainer.appendChild(movieElement);
+        });
+    })
+    .catch(error => console.error("Error fetching movies:", error));
+}
+</script>
+
+</body>
+</html>
