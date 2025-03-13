@@ -1,122 +1,44 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <title>Home Page</title>
-    <style>
-        /* Styling for the navigation bar (navbar) */
-        nav {
-            background-color: #333; /* Dark background color for the navbar */
-            padding: 10px; /* Adds space inside the navbar */
-        }
-
-        nav ul {
-            list-style-type: none; /* Removes default list bullets */
-            margin: 0; /* Removes any margin */
-            padding: 0; /* Removes any padding */
-            display: flex; /* Displays items side by side */
-            justify-content: space-around; /* Evenly spaces the navbar links */
-        }
-
-        nav ul li {
-            display: inline; /* Makes sure the list items stay on the same line */
-        }
-
-        nav ul li a {
-            color: white; /* White text color for links */
-            text-decoration: none; /* Removes underline from links */
-            padding: 10px; /* Adds padding around the links */
-            display: inline-block; /* Makes the links clickable as block elements */
-        }
-
-        nav ul li a:hover {
-            background-color: #575757; /* Darkens the background when hovered */
-        }
-
-        /* Basic layout for the page content */
-        .content {
-            margin-top: 20px; /* Adds space at the top */
-            text-align: center; /* Centers the content on the page */
-        }
-
-        .user-welcome {
-            font-size: 24px; /* Increases font size for the welcome message */
-            margin-bottom: 20px; /* Adds space below the welcome message */
-        }
-    </style>
 </head>
 <body>
 
-<!-- Navigation Bar (Navbar) -->
-<nav>
-    <ul>
-        <!-- These are the links in the navbar that the user can click to navigate -->
-        <li><a href="account.html">My Account</a></li>
-        <li><a href="browse.html">Browse</a></li>
-        <li><a href="friends.html">Friends</a></li>
-    </ul>
-</nav>
+<h1>Welcome to Movie Recommendations</h1>
 
-<!-- Main Content -->
-<div class="content">
-    <!-- Welcome message to the logged-in user -->
-    <div class="user-welcome">
-        <h1>Welcome to the Movie Portal</h1> <!-- Heading -->
-        <p>Sign in successful! Welcome back, <strong id="username"></strong>!</p> <!-- Displays the logged-in user's name -->
-    </div>
-
-    <!-- Search section for movies -->
-    <div id="searchSection">
-        <input type="text" id="searchQuery" placeholder="Search for a movie"> <!-- Input field for searching movies -->
-        <button onclick="searchMovies()">Search</button> <!-- Button to trigger the search -->
-    </div>
-
-    <!-- Div where movie results will appear -->
-    <div id="movieResults">
-        <!-- Movie results will be shown here -->
-    </div>
-</div>
+<!-- This div will display the recommended movies -->
+<div id="recommendations">Loading recommendations...</div>
 
 <script>
+// Function to fetch recommendations from the server
+function fetchRecommendations() {
+    var request = new XMLHttpRequest();
+    request.open("GET", "home.php", true); // Request to home.php
 
-    // Function to search for movies when the search button is clicked
-   /* function searchMovies() {
-        var query = document.getElementById("searchQuery").value; // Get the search term entered by the user
-        if (!query) { // If no search term is entered, show an alert
-            alert("Please enter a search term.");
-            return;
-        }*/
+    request.onreadystatechange = function () {
+        if (this.readyState === 4 && this.status === 200) {
+            var jsonResponse = JSON.parse(this.responseText); // Convert JSON to JS object
 
-        // Fetch movies from your API (replace with your actual API URL)
-        fetch("YOUR_API_ENDPOINT?query=" + encodeURIComponent(query)) // Sends the query to the API
-        .then(response => response.json()) // Convert the API response into JSON format
-        .then(data => {
-            var movies = data.results; // The results array returned from the API
-            var resultsContainer = document.getElementById("movieResults"); // Get the div to display movie results
-            resultsContainer.innerHTML = ""; // Clear previous results
+            // If successful, display the recommendations
+            if (jsonResponse.returnCode === 0) {
+                document.getElementById("recommendations").innerHTML = jsonResponse.recommendations.join("<br>");
+            } else {
+                document.getElementById("recommendations").innerHTML = "Failed to load recommendations.";
+            }
+        }
+    };
 
-            // Loop through each movie and display it on the page
-            movies.forEach(movie => {
-                var movieElement = document.createElement("div"); // Create a new div for each movie
-                movieElement.innerHTML = `
-                    <h3>${movie.title}</h3> <!-- Movie title -->
-                    <img src="${movie.poster}" alt="${movie.title}" width="100"> <!-- Movie poster image -->
-                    <p>${movie.description}</p> <!-- Movie description -->
-                    <a href="movie.html?id=${movie.id}">View Details</a> <!-- Link to view more details -->
-                    <hr> <!-- Horizontal line for separation -->
-                `;
-                resultsContainer.appendChild(movieElement); // Append the movie element to the results container
-            });
-        })
-        .catch(error => console.error("Error fetching movies:", error)); // If there's an error, log it to the console
-    }
-</script>
-
-<script>
-function logout() {
-    // Redirect the user to login.html when they log out
-    window.location.href = "index.html";
+    request.send(); // Send the request
 }
+
+// Call fetchRecommendations() automatically when the page loads
+window.onload = fetchRecommendations;
 </script>
+
+</body>
+</html>
+
 
 </body>
 </html>
