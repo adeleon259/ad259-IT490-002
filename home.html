@@ -7,38 +7,80 @@
 
 <h1>Welcome to Movie Recommendations</h1>
 
-<!-- This div will display the recommended movies -->
-<div id="recommendations">Loading recommendations...</div>
+<!-- Navigation Bar -->
+<div class="navbar">
+    <a href="home.html">Home</a>
+    <a href="browse.html">Browse</a>
+    <a href="friends.html">Friends</a>
+    
+</div>
+
+<!-- Main Content -->
+<div class="container">
+    <h1>Submit Preferences</h1>
+
+    <!-- Movie Recommendation Form -->
+    <div class="form-container">
+        <form onsubmit="event.preventDefault(); getMovieRecommendations();">
+            <label for="genre">Choose a genre:</label>
+            <select id="genre">
+                <option value="action">Action</option>
+                <option value="comedy">Comedy</option>
+                <option value="drama">Drama</option>
+                <option value="horror">Horror</option>
+                <option value="romance">Romance</option>
+                <option value="sci-fi">Sci-Fi</option>
+            </select><br>
+
+            <label for="year">Select a year range:</label>
+            <input type="text" id="year" placeholder="e.g. 2000-2020" required><br>
+
+            <label for="rating">Minimum rating (1-10):</label>
+            <input type="number" id="rating" min="1" max="10" required><br>
+
+            <button type="submit">Get Recommendations</button>
+        </form>
+    </div>
+
+    <!-- Recommendations will be displayed here -->
+    <div id="recommendations">Please fill in the form to get movie recommendations.</div>
+</div>
 
 <script>
-// Function to fetch recommendations from the server
-function fetchRecommendations() {
-    var request = new XMLHttpRequest();
-    request.open("GET", "home.php", true); // Request to home.php
+// Function to fetch movie recommendations based on user input
+function getMovieRecommendations() {
+    // Get user inputs from the form
+    var genre = document.getElementById("genre").value;
+    var year = document.getElementById("year").value;
+    var rating = document.getElementById("rating").value;
 
+    // Create a request to send the data to the backend
+    var request = new XMLHttpRequest();
+    request.open("POST", "home.php", true); // Request to home.php
+
+    // Send data in the format that the backend will understand
+    var data = "genre=" + encodeURIComponent(genre) + "&year=" + encodeURIComponent(year) + "&rating=" + encodeURIComponent(rating);
+
+    request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+    // When the request is complete, process the response
     request.onreadystatechange = function () {
         if (this.readyState === 4 && this.status === 200) {
-            var jsonResponse = JSON.parse(this.responseText); // Convert JSON to JS object
+            var jsonResponse = JSON.parse(this.responseText); // Convert JSON response to JS object
 
             // If successful, display the recommendations
             if (jsonResponse.returnCode === 0) {
                 document.getElementById("recommendations").innerHTML = jsonResponse.recommendations.join("<br>");
             } else {
-                document.getElementById("recommendations").innerHTML = "Failed to load recommendations.";
+                document.getElementById("recommendations").innerHTML = "Sorry, no recommendations found.";
             }
         }
     };
 
-    request.send(); // Send the request
+    // Send the request with the data
+    request.send(data);
 }
-
-// Call fetchRecommendations() automatically when the page loads
-window.onload = fetchRecommendations;
 </script>
-
-</body>
-</html>
-
 
 </body>
 </html>
