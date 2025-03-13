@@ -77,24 +77,14 @@
 </div>
 
 <script>
-    // In a real-world scenario, the username would be retrieved from a session, JWT token, or local storage after login.
-    // For this example, we will simulate a successful login with a hardcoded username.
-    const username = localStorage.getItem("username"); // Simulated fetching the username from localStorage (set after login)
-    
-    if (username) {
-        document.getElementById("username").textContent = username; // Display the username on the page
-    } else {
-        // If no username is found, the user is not logged in. Redirect them to the login page.
-        window.location.href = "login.html"; // Redirects to the login page if the user is not logged in
-    }
 
     // Function to search for movies when the search button is clicked
-    function searchMovies() {
+   /* function searchMovies() {
         var query = document.getElementById("searchQuery").value; // Get the search term entered by the user
         if (!query) { // If no search term is entered, show an alert
             alert("Please enter a search term.");
             return;
-        }
+        }*/
 
         // Fetch movies from your API (replace with your actual API URL)
         fetch("YOUR_API_ENDPOINT?query=" + encodeURIComponent(query)) // Sends the query to the API
