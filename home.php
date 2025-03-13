@@ -13,8 +13,10 @@ if (!isset($_SESSION['username'])) {
     exit;
 }
 
-// Get the logged-in user's username
-$username = $_SESSION['username'];
+// Get the user’s movie preferences from the form submission
+$genre = $_POST['genre'];
+$year = $_POST['year'];
+$rating = $_POST['rating'];
 
 // Create a RabbitMQ client instance to communicate with the server
 $client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
