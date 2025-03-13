@@ -24,7 +24,9 @@ $client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
 // Prepare a request to send to RabbitMQ
 $request = array();
 $request['type'] = "get_recommendations"; // Request type: fetch recommendations
-$request['username'] = $username; // Send the username to get personalized suggestions
+$request['genre'] = $genre; // Send the genre selected by the user
+$request['year'] = $year; // Send the year range
+$request['rating'] = $rating; // Send the rating
 
 // Send the request and get the response from RabbitMQ
 $response = $client->send_request($request);
